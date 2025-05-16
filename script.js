@@ -1,108 +1,94 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const input = document.getElementById("video-url");
-    const playButton = document.getElementById("play-button");
-    const videoContainer = document.getElementById("video-container");
-    const historyButton = document.getElementById("history-btn");
-    const menuPanel = document.getElementById("menu-panel");
-    const historyContainer = document.getElementById("history-container");
-    const historyTab = document.querySelector('[data-tab="history"]');
-    const tabs = document.querySelectorAll(".tab");
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("video-url");
+  const playButton = document.getElementById("play-button");
+  const videoContainer = document.getElementById("video-container");
+  const modeToggle = document.getElementById("mode-toggle");
+  const historyButton = document.getElementById("history-btn");
+  const menuPanel = document.getElementById("menu-panel");
+  const historyContainer = document.getElementById("history-container");
+  const tabs = document.querySelectorAll(".tab");
 
-    // 年を現在の年に自動設定
-    document.getElementById("year").textContent = new Date().getFullYear();
+  // 年表示
+  document.getElementById("year").textContent = new Date().getFullYear();
 
-    playButton.addEventListener("click", function () {
-        let url = input.value.trim();
-        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
+  // モード初期化 (localStorage から取得)
+  let embedMode = localStorage.getItem("embedMode") || "normal";
+  updateModeButton();
 
-        if (!youtubeRegex.test(url)) {
-            alert("正しいYouTubeのURLを入力してください。");
-            return;
-        }
+  modeToggle.addEventListener("click", () => {
+    embedMode = (embedMode === "normal") ? "nocookie" : "normal";
+    localStorage.setItem("embedMode", embedMode);
+    updateModeButton();
+  });
 
-        let videoId = "";
-        const match = url.match(/(?:v=|\/|embed\/|youtu.be\/)([0-9A-Za-z_-]{11})/);
-        if (match) {
-            videoId = match[1];
-        }
+  function updateModeButton() {
+    modeToggle.textContent = `モード: ${embedMode === 'normal' ? '通常' : 'NoCookie'}`;
+  }
 
-        if (!videoId) {
-            alert("動画IDを取得できませんでした。");
-            return;
-        }
+  playButton.addEventListener("click", () => {
+    const url = input.value.trim();
+    const ytRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
+    if (!ytRegex.test(url)) return alert("正しいYouTubeのURLを入力してください。");
 
-        fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`)
-            .then(response => response.json())
-            .then(data => {
-                let title = data.title || "不明なタイトル";
-                addToHistory(videoId, title);
+    const match = url.match(/(?:v=|\/|embed\/|youtu.be\/)([0-9A-Za-z_-]{11})/);
+    if (!match) return alert("動画IDを取得できませんでした。");
+    const videoId = match[1];
 
-                videoContainer.innerHTML = `
-                    <iframe width="560" height="315"
-                        src="https://www.youtube-nocookie.com/embed/${videoId}?rel=0"
-                        frameborder="0" allowfullscreen title="lemon">
-                    </iframe>
-                `;
-            })
-            .catch(() => alert("動画タイトルを取得できませんでした。"));
-    });
+    const domain = (embedMode === "normal") ? "www.youtube.com" : "www.youtube-nocookie.com";
+    fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`)
+      .then(res => res.json())
+      .then(data => {
+        const title = data.title || "不明なタイトル";
+        addToHistory(videoId, title, embedMode);
+        renderIframe(videoId, domain);
+      })
+      .catch(() => alert("動画タイトルを取得できませんでした。"));
+  });
 
-    function addToHistory(videoId, title) {
-        let history = JSON.parse(localStorage.getItem("videoHistory")) || [];
+  function renderIframe(id, domain) {
+    videoContainer.innerHTML = `
+      <iframe width="560" height="315"
+        src="https://${domain}/embed/${id}?rel=0"
+        frameborder="0" allowfullscreen></iframe>`;
+  }
 
-        history = history.filter(item => item.videoId !== videoId);
-        history.unshift({ videoId, title });
-
-        if (history.length > 50) history.pop();
-        localStorage.setItem("videoHistory", JSON.stringify(history));
-
-        updateHistoryUI();
-    }
-
-    function updateHistoryUI() {
-        let history = JSON.parse(localStorage.getItem("videoHistory")) || [];
-        historyContainer.innerHTML = "";
-
-        history.forEach((item) => {
-            let historyItem = document.createElement("div");
-            historyItem.classList.add("history-item");
-            historyItem.innerHTML = `
-                <a href="#" class="history-link" data-videoid="${item.videoId}">
-                    ${item.title}
-                </a>
-            `;
-            historyContainer.appendChild(historyItem);
-        });
-
-        document.querySelectorAll(".history-link").forEach((link) => {
-            link.addEventListener("click", function (event) {
-                event.preventDefault();
-                let videoId = this.getAttribute("data-videoid");
-
-                videoContainer.innerHTML = `
-                    <iframe width="560" height="315"
-                        src="https://www.youtube-nocookie.com/embed/${videoId}?rel=0"
-                        frameborder="0" allowfullscreen title="lemon">
-                    </iframe>
-                `;
-
-                let clickedTitle = this.textContent;
-                addToHistory(videoId, clickedTitle);
-            });
-        });
-    }
-
-    historyButton.addEventListener("click", function () {
-        menuPanel.style.display = menuPanel.style.display === "block" ? "none" : "block";
-    });
-
-    tabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-            tabs.forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
-            historyContainer.style.display = "block";
-        });
-    });
-
+  function addToHistory(id, title, mode) {
+    let history = JSON.parse(localStorage.getItem("videoHistory")) || [];
+    history = history.filter(item => item.videoId !== id || item.mode !== mode);
+    history.unshift({ videoId: id, title, mode });
+    if (history.length > 50) history.pop();
+    localStorage.setItem("videoHistory", JSON.stringify(history));
     updateHistoryUI();
+  }
+
+  function updateHistoryUI() {
+    const history = JSON.parse(localStorage.getItem("videoHistory")) || [];
+    historyContainer.innerHTML = "";
+    history.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "history-item";
+      div.innerHTML = `<a href='#' data-id='${item.videoId}' data-mode='${item.mode}'>
+        ${item.title} (${item.mode==='normal'?'通常':'NoCookie'})
+      </a>`;
+      historyContainer.appendChild(div);
+    });
+    document.querySelectorAll(".history-item a").forEach(a => {
+      a.addEventListener("click", e => {
+        e.preventDefault();
+        const id = a.dataset.id;
+        const mode = a.dataset.mode;
+        const domain = (mode==='normal')? 'www.youtube.com':'www.youtube-nocookie.com';
+        renderIframe(id, domain);
+        addToHistory(id, a.textContent, mode);
+      });
+    });
+  }
+
+  historyButton.addEventListener("click", () => {
+    menuPanel.style.display = menuPanel.style.display==='block'?'none':'block';
+  });
+  tabs.forEach(t => t.addEventListener("click", () => t.classList.toggle("active")));
+
+  // 初期履歴描画
+  updateHistoryUI();
 });

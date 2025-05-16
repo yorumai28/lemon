@@ -1,33 +1,37 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>lemon</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>lemon</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>lemon</h1>
-        <input type="text" id="video-url" placeholder="YouTubeのURLまたは動画IDを入力">
-        <button id="play-button">再生</button>
-        <div id="video-container"></div>
+  <div class="container">
+    <h1>lemon</h1>
+
+    <div class="input-area">
+      <input type="text" id="video-url" placeholder="YouTubeのURLまたは動画IDを入力">
+      <button id="mode-toggle">モード: 通常</button>
+      <button id="play-button">再生</button>
     </div>
 
-    <button id="history-btn">≡</button>
+    <div id="video-container"></div>
+  </div>
 
-    <div id="menu-panel">
-        <div id="menu-tabs">
-            <span class="tab active" data-tab="history">履歴</span>
-        </div>
-        <div id="tab-content">
-            <div id="history-container"></div>
-        </div>
+  <button id="history-btn">≡</button>
+
+  <div id="menu-panel">
+    <div id="menu-tabs">
+      <span class="tab active" data-tab="history">履歴</span>
     </div>
+    <div id="tab-content">
+      <div id="history-container"></div>
+    </div>
+  </div>
 
-    <footer>© <span id="year"></span> lemon</footer>
+  <footer>© <span id="year"></span> lemon</footer>
 
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
-
