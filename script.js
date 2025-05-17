@@ -11,16 +11,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // 年表示
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  // モード初期化 (localStorage から取得)
+  // モード初期化
   let embedMode = localStorage.getItem("embedMode") || "normal";
   updateModeButton();
-
   modeToggle.addEventListener("click", () => {
     embedMode = (embedMode === "normal") ? "nocookie" : "normal";
     localStorage.setItem("embedMode", embedMode);
     updateModeButton();
   });
-
   function updateModeButton() {
     modeToggle.textContent = `モード: ${embedMode === 'normal' ? '通常' : 'NoCookie'}`;
   }
@@ -45,11 +43,20 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(() => alert("動画タイトルを取得できませんでした。"));
   });
 
+  // ループ再生用 iframe レンダリング
   function renderIframe(id, domain) {
+    const src = [
+      `https://${domain}/embed/${id}`,
+      `?rel=0`,
+      `&autoplay=1`,
+      `&loop=1`,
+      `&playlist=${id}`
+    ].join('');
     videoContainer.innerHTML = `
       <iframe width="560" height="315"
-        src="https://${domain}/embed/${id}?rel=0"
-        frameborder="0" allowfullscreen></iframe>`;
+        src="${src}"
+        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+      </iframe>`;
   }
 
   function addToHistory(id, title, mode) {
