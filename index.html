@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -11,8 +12,14 @@
     <h1>lemon</h1>
 
     <div class="input-area">
-      <input type="text" id="video-url" placeholder="YouTubeのURLまたは動画IDを入力">
-      <button id="mode-toggle">モード: 通常</button>
+      <input
+        type="text"
+        id="video-url"
+        data-ph-normal="https://www.youtube.com/……　　　　　"
+        data-ph-nocookie="https://www.youtube-nocookie.com/……"
+        placeholder="https://www.youtube.com/……　　　　　"
+      >
+      <button id="mode-toggle">モード: 通常　　　</button>
       <button id="play-button">再生</button>
     </div>
 
