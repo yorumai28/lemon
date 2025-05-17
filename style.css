@@ -1,3 +1,5 @@
+/* style.css */
+
 body {
   font-family: Arial, sans-serif;
   text-align: center;
@@ -22,36 +24,56 @@ h1 {
 
 .input-area {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   margin-bottom: 20px;
 }
 
-input[type="text"] {
-  flex: 1;
+/* 各要素に固定幅を与えてズレを防止 */
+.input-area #video-url {
+  flex: none;
+  width: 360px;             /* 固定幅 */
   padding: 10px;
   font-size: 16px;
   border: 1px solid #5f6368;
   border-radius: 5px;
   background-color: #202124;
   color: #e8eaed;
+  box-sizing: border-box;
+  white-space: nowrap;      /* 改行禁止 */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-#mode-toggle,
-button#play-button {
-  padding: 10px 12px;
+#mode-toggle {
+  flex: none;
+  width: 120px;             /* 最長テキストに合わせて調整 */
+  padding: 10px 0;
   font-size: 14px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   background-color: #1a73e8;
   color: white;
-  transition: background-color 0.2s;
+  white-space: nowrap;      /* 改行禁止 */
+}
+
+#play-button {
+  flex: none;
+  width: 60px;              /* 「再生」のラベル幅 */
+  padding: 10px 0;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #1a73e8;
+  color: white;
+  white-space: nowrap;
 }
 
 #mode-toggle:hover,
-button#play-button:hover {
+#play-button:hover {
   background-color: #185abc;
 }
 
@@ -87,7 +109,9 @@ button#play-button:hover {
   border-bottom: 2px solid transparent;
 }
 
-.tab.active { border-bottom: 2px solid #FFEF6C; }
+.tab.active {
+  border-bottom: 2px solid #FFEF6C;
+}
 
 #history-container {
   max-height: 200px;
@@ -96,9 +120,15 @@ button#play-button:hover {
   margin-top: 10px;
 }
 
-.history-item { padding: 5px 0; border-bottom: 1px solid gray; }
+.history-item {
+  padding: 5px 0;
+  border-bottom: 1px solid gray;
+}
 
-.history-item a { text-decoration: none; color: white; }
+.history-item a {
+  text-decoration: none;
+  color: white;
+}
 
 footer {
   position: fixed;
@@ -109,4 +139,6 @@ footer {
   font-size: 14px;
 }
 
-#video-container { margin-top: 20px; }
+#video-container {
+  margin-top: 20px;
+}
